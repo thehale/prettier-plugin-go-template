@@ -7,57 +7,51 @@ export const parseGoTemplate: Parser<GoNode>["parse"] = (text, _options) => {
   const root = createRootNode(text);
   const nodeStack: (GoRoot | GoBlock)[] = [root];
 
-  for (const match of tokenize(text)) {
+  for (const token of tokenize(text)) {
     const current = last(nodeStack);
-    const keyword = match.groups?.keyword as GoBlockKeyword | undefined;
-    const statement = match.groups?.statement;
-    const unformattable = match.groups?.unformattableScript ?? match.groups?.unformattableStyle;
-
-    const startDelimiter = (match.groups?.startdelimiter ?? "") as GoInlineStartDelimiter;
-    const endDelimiter = (match.groups?.endDelimiter ?? "") as GoInlineEndDelimiter;
 
     if (current === undefined) {
       throw Error("Node stack empty.");
     }
 
-    if (match.index === undefined) {
+    if (token.index === undefined) {
       throw Error("Regex match index undefined.");
     }
     const id = createID();
-    if (unformattable) {
+    if (token.unformattable) {
       current.children[id] = {
         id,
         type: "unformattable",
-        index: match.index,
-        length: match[0].length,
-        content: unformattable,
+        index: token.index,
+        length: token.length,
+        content: token.unformattable,
         parent: current,
       };
       continue;
     }
 
-    if (statement === undefined) {
+    if (token.statement === undefined) {
       throw Error("Formattable match without statement.");
     }
 
     const inline: GoInline = {
-      index: match.index,
-      length: match[0].length,
-      startDelimiter,
-      endDelimiter,
+      index: token.index,
+      length: token.length,
+      startDelimiter: token.startDelimiter,
+      endDelimiter: token.endDelimiter,
       parent: current,
       type: "inline",
-      statement,
+      statement: token.statement,
       id,
     };
 
-    if (keyword === "end" || keyword === "prettier-ignore-end") {
+    if (token.keyword === "end" || token.keyword === "prettier-ignore-end") {
       if (current.type !== "block") {
         throw Error("Encountered unexpected end keyword.");
       }
 
-      current.length = match[0].length + match.index - current.index;
-      current.content = text.substring(current.contentStart, match.index);
+      current.length = token.length + token.index - current.index;
+      current.content = text.substring(current.contentStart, token.index);
       current.aliasedContent = aliasNodeContent(current);
       current.end = inline;
 
@@ -71,22 +65,22 @@ export const parseGoTemplate: Parser<GoNode>["parse"] = (text, _options) => {
       }
 
       nodeStack.pop();
-    } else if (isBlock(current) && keyword === "else") {
+    } else if (isBlock(current) && token.keyword === "else") {
       const nextChild: GoBlock = {
         type: "block",
         start: inline,
         end: null,
         children: {},
-        keyword: keyword,
-        index: match.index,
+        keyword: token.keyword as GoBlockKeyword,
+        index: token.index,
         parent: current.parent,
-        contentStart: match.index + match[0].length,
+        contentStart: token.index + token.length,
         content: "",
         aliasedContent: "",
         length: -1,
         id: createID(),
-        startDelimiter,
-        endDelimiter,
+        startDelimiter: token.startDelimiter,
+        endDelimiter: token.endDelimiter,
       };
 
       if (isMultiBlock(current.parent)) {
@@ -97,7 +91,7 @@ export const parseGoTemplate: Parser<GoNode>["parse"] = (text, _options) => {
           parent: current.parent,
           index: current.index,
           length: -1,
-          keyword,
+          keyword: token.keyword as GoBlockKeyword,
           id: current.id,
           blocks: [current, nextChild],
         };
@@ -112,28 +106,28 @@ export const parseGoTemplate: Parser<GoNode>["parse"] = (text, _options) => {
       }
 
       current.id = createID();
-      current.length = match[0].length + match.index - current.index;
-      current.content = text.substring(current.contentStart, match.index);
+      current.length = token.length + token.index - current.index;
+      current.content = text.substring(current.contentStart, token.index);
       current.aliasedContent = aliasNodeContent(current);
 
       nodeStack.pop();
       nodeStack.push(nextChild);
-    } else if (keyword) {
+    } else if (token.keyword) {
       const block: GoBlock = {
         type: "block",
         start: inline,
         end: null,
         children: {},
-        keyword: keyword as GoBlockKeyword,
-        index: match.index,
+        keyword: token.keyword as GoBlockKeyword,
+        index: token.index,
         parent: current,
-        contentStart: match.index + match[0].length,
+        contentStart: token.index + token.length,
         content: "",
         aliasedContent: "",
         length: -1,
         id: createID(),
-        startDelimiter,
-        endDelimiter,
+        startDelimiter: token.startDelimiter,
+        endDelimiter: token.endDelimiter,
       };
 
       current.children[block.id] = block;

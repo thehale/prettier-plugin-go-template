@@ -1,6 +1,21 @@
+import { GoBlockKeyword, GoInlineEndDelimiter, GoInlineStartDelimiter } from "./types";
+
 export function tokenize(text: string) {
   const regex = buildRegex();
-  return text.matchAll(regex);
+  return text.matchAll(regex).map(toToken);
+}
+
+function toToken(match: RegExpMatchArray) {
+  return {
+    keyword: match.groups?.keyword as GoBlockKeyword | undefined,
+    statement: match.groups?.statement,
+    unformattable: match.groups?.unformattableScript ?? match.groups?.unformattableStyle,
+    startDelimiter: (match.groups?.startdelimiter ?? "") as GoInlineStartDelimiter,
+    endDelimiter: (match.groups?.endDelimiter ?? "") as GoInlineEndDelimiter,
+    
+    index: match.index,
+    length: match[0].length,
+  }
 }
 
 // ---------------------------------------------------------------------------------------
