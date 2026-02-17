@@ -29,9 +29,9 @@ const PLUGIN_KEY = "go-template";
 type ExtendedParserOptions = ParserOptions<GoNode> &
   PrettierPluginGoTemplateParserOptions;
 
-export type PrettierPluginGoTemplateParserOptions = {
+export interface PrettierPluginGoTemplateParserOptions {
   goTemplateBracketSpacing: boolean;
-};
+}
 
 export const options: {
   [K in keyof PrettierPluginGoTemplateParserOptions]: any;
@@ -63,7 +63,7 @@ export const languages: SupportLanguage[] = [
   },
 ];
 export const parsers = {
-  [PLUGIN_KEY]: <Parser<GoNode>>{
+  [PLUGIN_KEY]: {
     astFormat: PLUGIN_KEY,
     preprocess: (text) =>
       // Cut away trailing newline to normalize formatting.
@@ -71,10 +71,10 @@ export const parsers = {
     parse: parseGoTemplate,
     locStart: (node) => node.index,
     locEnd: (node) => node.index + node.length,
-  },
+  } as Parser<GoNode>,
 };
 export const printers = {
-  [PLUGIN_KEY]: <Printer<GoNode>>{
+  [PLUGIN_KEY]: {
     print: (path, options: ExtendedParserOptions, print) => {
       const node = path.getNode();
 
@@ -99,7 +99,7 @@ export const printers = {
         throw e;
       }
     },
-  },
+  } as Printer<GoNode>,
 };
 
 const embed: Exclude<Printer<GoNode>["embed"], undefined> = () => {

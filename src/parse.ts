@@ -16,7 +16,7 @@ export const parseGoTemplate: Parser<GoNode>["parse"] = (text, options) => {
   const nodeStack: (GoBlock | GoRoot)[] = [root];
   const getId = createIdGenerator();
 
-  for (let match of text.matchAll(regex)) {
+  for (const match of text.matchAll(regex)) {
     const current = last(nodeStack);
     const keyword = match.groups?.keyword as GoBlockKeyword | undefined;
     const statement = match.groups?.statement;
@@ -225,9 +225,7 @@ export interface GoBaseNode<Type extends string> {
 
 export interface GoBlock extends GoBaseNode<"block">, WithDelimiter {
   keyword: GoBlockKeyword;
-  children: {
-    [id: string]: GoNode;
-  };
+  children: Record<string, GoNode>;
   start: GoInline;
   end: GoInline | null;
   content: string;
