@@ -8,7 +8,7 @@ import {
   SupportOption,
 } from "prettier";
 import { builders, utils } from "prettier/doc";
-import {
+import type {
   GoBlock,
   GoInline,
   GoInlineEndDelimiter,
@@ -17,6 +17,8 @@ import {
   GoNode,
   GoRoot,
   GoUnformattable,
+} from "./types";
+import {
   isBlock,
   isMultiBlock,
   isRoot,
