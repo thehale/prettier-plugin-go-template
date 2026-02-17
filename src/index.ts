@@ -5,6 +5,7 @@ import {
   ParserOptions,
   Printer,
   SupportLanguage,
+  SupportOption,
 } from "prettier";
 import { builders, utils } from "prettier/doc";
 import {
@@ -32,7 +33,7 @@ export interface PrettierPluginGoTemplateParserOptions {
 }
 
 export const options: {
-  [K in keyof PrettierPluginGoTemplateParserOptions]: any;
+  [K in keyof PrettierPluginGoTemplateParserOptions]: SupportOption;
 } = {
   goTemplateBracketSpacing: {
     type: "boolean",
