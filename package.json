@@ -35,7 +35,8 @@
     "watch": "npm run build -- --watch",
     "watch:test": "NODE_OPTIONS=--experimental-vm-modules jest --watch",
     "release:plugin": "npm run build && npm run release:coverage && npm publish",
-    "release:plugin:local": "npm run build && npm run release:coverage && npm publish --registry=http://localhost:4873/"
+    "release:plugin:local": "npm run build && npm run release:coverage && npm publish --registry=http://localhost:4873/",
+    "ci": "npm run lint && npm run test && npm run build"
   },
   "dependencies": {
     "ulid": "^3.0.1"
