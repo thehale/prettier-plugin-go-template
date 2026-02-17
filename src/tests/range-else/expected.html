@@ -1,0 +1,7 @@
+<ul>
+  {{ range .Items }}
+    <li>{{ .Name }}</li>
+  {{ else }}
+    <li>No items available</li>
+  {{ end }}
+</ul>

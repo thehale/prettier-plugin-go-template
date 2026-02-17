@@ -1,0 +1,12 @@
+{{ range .Categories }}
+  <div>
+    <h2>{{ .Title }}</h2>
+    {{ range .Items }}
+      <span>{{ . }}</span>
+    {{ else }}
+      <span>No items</span>
+    {{ end }}
+  </div>
+{{ else }}
+  <p>No categories</p>
+{{ end }}

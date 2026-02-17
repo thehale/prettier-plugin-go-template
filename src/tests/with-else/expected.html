@@ -1,0 +1,7 @@
+<div>
+  {{ with .User }}
+    <p>Welcome, {{ .Name }}!</p>
+  {{ else }}
+    <p>Please log in</p>
+  {{ end }}
+</div>

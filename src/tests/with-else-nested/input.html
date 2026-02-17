@@ -1,0 +1,11 @@
+{{ with .User }}
+<div>
+{{ with .Profile }}
+<p>Bio: {{ .Bio }}</p>
+{{ else }}
+<p>No profile</p>
+{{ end }}
+</div>
+{{ else }}
+<p>Not logged in</p>
+{{ end }}
