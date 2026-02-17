@@ -38,11 +38,8 @@ export const parseGoTemplate: Parser<GoNode>["parse"] = (text, _options) => {
 
       if (current.parent.type === "multi-block") {
         const firstChild = current.parent.blocks[0];
-        const lastChild =
-          current.parent.blocks[current.parent.blocks.length - 1];
-
-        current.parent.length =
-          lastChild.index + lastChild.length - firstChild.index;
+        const lastChild = current.parent.blocks[current.parent.blocks.length - 1];
+        current.parent.length = lastChild.index + lastChild.length - firstChild.index;
       }
 
       nodeStack.pop();
