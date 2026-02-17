@@ -155,7 +155,7 @@ export const parseGoTemplate: Parser<GoNode>["parse"] = (text, _options) => {
     }
   }
 
-  if (!isRoot(nodeStack.pop()!)) {
+  if (!isRoot(nodeStack.pop())) {
     throw Error("Missing end block.");
   }
 
@@ -267,8 +267,8 @@ export function isMultiBlock(node: GoNode): node is GoMultiBlock {
   return node.type === "double-block";
 }
 
-export function isRoot(node: GoNode): node is GoRoot {
-  return node.type === "root";
+export function isRoot(node?: GoNode): node is GoRoot {
+  return node?.type === "root";
 }
 
 export function isUnformattable(node: GoNode): node is GoRoot {
