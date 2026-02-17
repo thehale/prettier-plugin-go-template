@@ -44,41 +44,33 @@ export const parseGoTemplate: Parser<GoNode>["parse"] = (text, _options) => {
 
       nodeStack.pop();
     } else if (isBlock(current) && token.keyword === "else") {
-      const nextChild = createBlockNode(token, inline, current.parent);
-
-      if (isMultiBlock(current.parent)) {
-        current.parent.blocks.push(nextChild);
-      } else {
-        const multiBlock: GoMultiBlock = {
-          type: "multi-block",
-          parent: current.parent,
-          index: current.index,
-          length: -1,
-          keyword: token.keyword as GoBlockKeyword,
-          id: current.id,
-          blocks: [current, nextChild],
-        };
-        nextChild.parent = multiBlock;
-        current.parent = multiBlock;
-
-        if ("children" in multiBlock.parent) {
-          multiBlock.parent.children[multiBlock.id] = multiBlock;
-        } else {
-          throw Error("Could not find child in parent.");
-        }
+      if (!isMultiBlock(current.parent)) {
+        throw Error("Encountered else outside of multi-block context.");
       }
 
-      current.id = createID();
+      // Finalize current block
       current.length = token.length + token.index - current.index;
       current.content = text.substring(current.contentStart, token.index);
       current.aliasedContent = aliasNodeContent(current);
+
+      // Create and add next block
+      const nextChild = createBlockNode(token, inline, current.parent);
+      current.parent.blocks.push(nextChild);
 
       nodeStack.pop();
       nodeStack.push(nextChild);
     } else if (token.keyword) {
       const block = createBlockNode(token, inline, current);
-      current.children[block.id] = block;
-      nodeStack.push(block);
+
+      if (canHaveElse(token.keyword)) {
+        const multiBlock = createMultiBlockWrapper(block, current);
+        block.parent = multiBlock;
+        current.children[multiBlock.id] = multiBlock;
+        nodeStack.push(block);
+      } else {
+        current.children[block.id] = block;
+        nodeStack.push(block);
+      }
     } else {
       current.children[inline.id] = inline;
     }
@@ -146,6 +138,22 @@ function createBlockNode(token: Token & { index: number }, inline: GoInline, par
     startDelimiter: token.startDelimiter,
     endDelimiter: token.endDelimiter,
   } satisfies GoBlock;
+}
+
+function canHaveElse(keyword?: GoBlockKeyword): boolean {
+  return ["if", "range", "with"].includes(keyword ?? "");
+}
+
+function createMultiBlockWrapper(block: GoBlock, parent: GoParentNode): GoMultiBlock {
+  return {
+    type: "multi-block",
+    parent: parent,
+    index: block.index,
+    length: -1,
+    keyword: block.keyword,
+    id: createID(),
+    blocks: [block],
+  } satisfies GoMultiBlock;
 }
 
 function aliasNodeContent(current: GoBlock | GoRoot): string {
