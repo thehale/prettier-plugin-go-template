@@ -1,4 +1,4 @@
-import type { GoNode, GoRoot, GoBlock, GoInline, GoMultiBlock, GoBlockKeyword, GoInlineStartDelimiter, GoInlineEndDelimiter, GoUnformattable, GoParentNode  } from "./types";
+import type { GoNode, GoRoot, GoBlock, GoInline, GoMultiBlock, GoBlockKeyword, GoUnformattable, GoParentNode  } from "./types";
 import { Parser } from "prettier";
 import { createID } from "./create-id";
 import { assertIndexed, assertStatemented, Token, tokenize } from "./tokenizer";
@@ -17,7 +17,7 @@ export const parseGoTemplate: Parser<GoNode>["parse"] = (text, _options) => {
     assertIndexed(token);
 
     if (token.unformattable) {
-      let node = createUnformattableNode(token, current);
+      const node = createUnformattableNode(token, current);
       current.children[node.id] = node;
       continue;
     }
