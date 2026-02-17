@@ -10,7 +10,7 @@ function toToken(match: RegExpMatchArray) {
     keyword: match.groups?.keyword as GoBlockKeyword | undefined,
     statement: match.groups?.statement,
     unformattable: match.groups?.unformattableScript ?? match.groups?.unformattableStyle,
-    startDelimiter: (match.groups?.startdelimiter ?? "") as GoInlineStartDelimiter,
+    startDelimiter: (match.groups?.startDelimiter ?? "") as GoInlineStartDelimiter,
     endDelimiter: (match.groups?.endDelimiter ?? "") as GoInlineEndDelimiter,
     
     index: match.index,
@@ -41,7 +41,7 @@ const END_DELIMITERS = ['-', '>', '%', '*/'];
 const BLOCK_KEYWORDS = ['if', 'range', 'block', 'with', 'define', 'end', 'else', 'prettier-ignore-start', 'prettier-ignore-end'];
 
 function buildRegex() {
-  const startDelimiter = String.raw`(?<startdelimiter>${pattern(START_DELIMITERS)})?`;
+  const startDelimiter = String.raw`(?<startDelimiter>${pattern(START_DELIMITERS)})?`;
   const endDelimiter = String.raw`(?<endDelimiter>${pattern(END_DELIMITERS)})?`;
   const keyword = String.raw`(?<keyword>${pattern(BLOCK_KEYWORDS)})?`;
   const statement = String.raw`(?<statement>${keyword}[\s\S]*?)`;
@@ -76,7 +76,7 @@ function unformattableHtmlTag(tagName: string) {
 };
 
 const OG_REGEX =
-    /{{(?<startdelimiter>-|<|%|\/\*)?\s*(?<statement>(?<keyword>if|range|block|with|define|end|else|prettier-ignore-start|prettier-ignore-end)?[\s\S]*?)\s*(?<endDelimiter>-|>|%|\*\/)?}}|(?<unformattableScript><(script)((?!<)[\s\S])*>((?!<\/script)[\s\S])*?{{[\s\S]*?<\/(script)>)|(?<unformattableStyle><(style)((?!<)[\s\S])*>((?!<\/style)[\s\S])*?{{[\s\S]*?<\/(style)>)/g;
+    /{{(?<startDelimiter>-|<|%|\/\*)?\s*(?<statement>(?<keyword>if|range|block|with|define|end|else|prettier-ignore-start|prettier-ignore-end)?[\s\S]*?)\s*(?<endDelimiter>-|>|%|\*\/)?}}|(?<unformattableScript><(script)((?!<)[\s\S])*>((?!<\/script)[\s\S])*?{{[\s\S]*?<\/(script)>)|(?<unformattableStyle><(style)((?!<)[\s\S])*>((?!<\/style)[\s\S])*?{{[\s\S]*?<\/(style)>)/g;
 function TMP_validateRegex(regex: RegExp) {
   if (regex.source !== OG_REGEX.source) {
     console.error("Regex mismatch!");
