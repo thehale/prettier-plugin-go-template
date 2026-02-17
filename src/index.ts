@@ -1,6 +1,6 @@
 import {
   doc,
-  FastPath,
+  AstPath,
   Parser,
   ParserOptions,
   Printer,
@@ -192,11 +192,11 @@ const embed: Exclude<Printer<GoNode>["embed"], undefined> = () => {
   };
 };
 
-type PrintFn = (path: FastPath<GoNode>) => builders.Doc;
+type PrintFn = (path: AstPath<GoNode>) => builders.Doc;
 
 function printMultiBlock(
   node: GoMultiBlock,
-  path: FastPath<GoNode>,
+  path: AstPath<GoNode>,
   print: PrintFn,
 ): builders.Doc {
   return [...path.map(print, "blocks")];
@@ -221,7 +221,7 @@ function isFollowedByNode(node: GoInline): boolean {
 
 function printInline(
   node: GoInline,
-  path: FastPath<GoNode>,
+  path: AstPath<GoNode>,
   options: ExtendedParserOptions,
 ): builders.Doc {
   const isBlockNode = isBlockEnd(node) || isBlockStart(node);
