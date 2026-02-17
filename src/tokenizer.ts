@@ -1,10 +1,17 @@
+export function tokenize(text: string) {
+  const regex = buildRegex();
+  return text.matchAll(regex);
+}
+
+// ---------------------------------------------------------------------------------------
+
 const TEMPLATE_START = '{{';
 const TEMPLATE_END = '}}';
 const START_DELIMITERS = ['-', '<', '%', '/*'];
 const END_DELIMITERS = ['-', '>', '%', '*/'];
 const BLOCK_KEYWORDS = ['if', 'range', 'block', 'with', 'define', 'end', 'else', 'prettier-ignore-start', 'prettier-ignore-end'];
 
-export function tokenize(text: string) {
+function buildRegex() {
   const startDelimiter = String.raw`(?<startdelimiter>${pattern(START_DELIMITERS)})?`;
   const endDelimiter = String.raw`(?<endDelimiter>${pattern(END_DELIMITERS)})?`;
   const keyword = String.raw`(?<keyword>${pattern(BLOCK_KEYWORDS)})?`;
@@ -18,7 +25,7 @@ export function tokenize(text: string) {
 
   TMP_validateRegex(regex);
 
-  return text.matchAll(regex);
+  return regex;
 }
 
 function pattern(tokens: string[]) {
