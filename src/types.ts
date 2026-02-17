@@ -37,7 +37,7 @@ export interface GoInline extends GoBaseNode<"inline">, WithDelimiter {
   statement: string;
 }
 
-export interface GoMultiBlock extends GoBaseNode<"double-block"> {
+export interface GoMultiBlock extends GoBaseNode<"multi-block"> {
   blocks: (GoBlock | GoMultiBlock)[];
   keyword: GoBlockKeyword;
 }

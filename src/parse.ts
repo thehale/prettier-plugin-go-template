@@ -36,7 +36,7 @@ export const parseGoTemplate: Parser<GoNode>["parse"] = (text, _options) => {
       current.aliasedContent = aliasNodeContent(current);
       current.end = inline;
 
-      if (current.parent.type === "double-block") {
+      if (current.parent.type === "multi-block") {
         const firstChild = current.parent.blocks[0];
         const lastChild =
           current.parent.blocks[current.parent.blocks.length - 1];
@@ -53,7 +53,7 @@ export const parseGoTemplate: Parser<GoNode>["parse"] = (text, _options) => {
         current.parent.blocks.push(nextChild);
       } else {
         const multiBlock: GoMultiBlock = {
-          type: "double-block",
+          type: "multi-block",
           parent: current.parent,
           index: current.index,
           length: -1,
@@ -180,7 +180,7 @@ export function isBlock(node: GoNode): node is GoBlock {
 }
 
 export function isMultiBlock(node: GoNode): node is GoMultiBlock {
-  return node.type === "double-block";
+  return node.type === "multi-block";
 }
 
 export function isRoot(node?: GoNode): node is GoRoot {

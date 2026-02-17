@@ -82,7 +82,7 @@ export const printers = {
       switch (node?.type) {
         case "inline":
           return printInline(node, path, options);
-        case "double-block":
+        case "multi-block":
           return printMultiBlock(node, path, print);
         case "unformattable":
           return printUnformattable(node, options);
