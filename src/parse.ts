@@ -1,10 +1,9 @@
 import type { GoNode, GoRoot, GoBlock, GoInline, GoMultiBlock, GoBlockKeyword, GoInlineStartDelimiter, GoInlineEndDelimiter  } from "./types";
 import { Parser } from "prettier";
 import { createID } from "./create-id";
+import { tokenize } from "./tokenizer";
 
 export const parseGoTemplate: Parser<GoNode>["parse"] = (text, _options) => {
-  const regex =
-    /{{(?<startdelimiter>-|<|%|\/\*)?\s*(?<statement>(?<keyword>if|range|block|with|define|end|else|prettier-ignore-start|prettier-ignore-end)?[\s\S]*?)\s*(?<endDelimiter>-|>|%|\*\/)?}}|(?<unformattableScript><(script)((?!<)[\s\S])*>((?!<\/script)[\s\S])*?{{[\s\S]*?<\/(script)>)|(?<unformattableStyle><(style)((?!<)[\s\S])*>((?!<\/style)[\s\S])*?{{[\s\S]*?<\/(style)>)/g;
   const root: GoRoot = {
     type: "root",
     content: text,
@@ -16,7 +15,7 @@ export const parseGoTemplate: Parser<GoNode>["parse"] = (text, _options) => {
   };
   const nodeStack: (GoBlock | GoRoot)[] = [root];
 
-  for (const match of text.matchAll(regex)) {
+  for (const match of tokenize(text)) {
     const current = last(nodeStack);
     const keyword = match.groups?.keyword as GoBlockKeyword | undefined;
     const statement = match.groups?.statement;
