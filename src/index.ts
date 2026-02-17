@@ -263,16 +263,14 @@ function printStatement(
   const space = addSpaces ? " " : "";
   const shouldBreak = statement.includes("\n");
 
-  const content = shouldBreak
-    ? statement
-        .trim()
-        .split("\n")
-        .map((line, _, array) =>
-          array.indexOf(line) === array.length - 1
-            ? [line.trim(), builders.softline]
-            : builders.indent([line.trim(), builders.softline]),
-        )
-    : [statement.trim()];
+  const content = statement
+    .trim()
+    .split("\n")
+    .map((line, _, array) =>
+      array.indexOf(line) === array.length - 1
+        ? [line.trim(), builders.softline]
+        : builders.indent([line.trim(), builders.softline]),
+    );
 
   return builders.group(
     [
