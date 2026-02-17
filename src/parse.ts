@@ -168,10 +168,6 @@ function last<T>(array: T[]): T | undefined {
   return array[array.length - 1];
 }
 
-export function isInline(node: GoNode): node is GoInline {
-  return node.type === "inline";
-}
-
 export function isBlock(node: GoNode): node is GoBlock {
   return node.type === "block";
 }
@@ -183,8 +179,3 @@ export function isMultiBlock(node: GoNode): node is GoMultiBlock {
 export function isRoot(node?: GoNode): node is GoRoot {
   return node?.type === "root";
 }
-
-export function isUnformattable(node: GoNode): node is GoRoot {
-  return node.type === "unformattable";
-}
-
