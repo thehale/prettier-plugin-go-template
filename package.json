@@ -37,6 +37,9 @@
     "release:plugin": "npm run build && npm run release:coverage && npm publish",
     "release:plugin:local": "npm run build && npm run release:coverage && npm publish --registry=http://localhost:4873/"
   },
+  "dependencies": {
+    "ulid": "^3.0.1"
+  },
   "peerDependencies": {
     "prettier": "^3.0.0"
   },
@@ -55,8 +58,5 @@
   },
   "engines": {
     "node": ">=20.0.0"
-  },
-  "dependencies": {
-    "ulid": "^3.0.1"
   }
 }
