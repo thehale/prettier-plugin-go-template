@@ -6,7 +6,7 @@ export function tokenize(text: string) {
 }
 
 function toToken(match: RegExpMatchArray) {
-  return {
+  return Object.freeze({
     keyword: match.groups?.keyword as GoBlockKeyword | undefined,
     statement: match.groups?.statement,
     unformattable: match.groups?.unformattableScript ?? match.groups?.unformattableStyle,
@@ -15,6 +15,18 @@ function toToken(match: RegExpMatchArray) {
     
     index: match.index,
     length: match[0].length,
+  })
+}
+
+export function assertIndexed<T extends Token>(token: T): asserts token is T & { index: number } {
+  if (token.index === undefined) {
+    throw new Error("Regex match index undefined.");
+  }
+}
+
+export function assertStatemented<T extends Token>(token: T): asserts token is T & { statement: string } {
+  if (token.statement === undefined) {
+    throw new Error("Formattable match without statement.");
   }
 }
 

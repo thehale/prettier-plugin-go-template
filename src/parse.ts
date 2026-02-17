@@ -1,7 +1,7 @@
 import type { GoNode, GoRoot, GoBlock, GoInline, GoMultiBlock, GoBlockKeyword, GoInlineStartDelimiter, GoInlineEndDelimiter, GoUnformattable, GoParentNode  } from "./types";
 import { Parser } from "prettier";
 import { createID } from "./create-id";
-import { Token, tokenize } from "./tokenizer";
+import { assertIndexed, assertStatemented, Token, tokenize } from "./tokenizer";
 
 export const parseGoTemplate: Parser<GoNode>["parse"] = (text, _options) => {
   const root = createRootNode(text);
@@ -14,31 +14,17 @@ export const parseGoTemplate: Parser<GoNode>["parse"] = (text, _options) => {
       throw Error("Node stack empty.");
     }
 
-    if (token.index === undefined) {
-      throw Error("Regex match index undefined.");
-    }
-    
+    assertIndexed(token);
+
     if (token.unformattable) {
       let node = createUnformattableNode(token, current);
       current.children[node.id] = node;
       continue;
     }
 
-    if (token.statement === undefined) {
-      throw Error("Formattable match without statement.");
-    }
+    assertStatemented(token);
 
-    const id = createID();
-    const inline: GoInline = {
-      index: token.index,
-      length: token.length,
-      startDelimiter: token.startDelimiter,
-      endDelimiter: token.endDelimiter,
-      parent: current,
-      type: "inline",
-      statement: token.statement,
-      id,
-    };
+    const inline = createInlineNode(token, current);
 
     if (token.keyword === "end" || token.keyword === "prettier-ignore-end") {
       if (current.type !== "block") {
@@ -61,22 +47,7 @@ export const parseGoTemplate: Parser<GoNode>["parse"] = (text, _options) => {
 
       nodeStack.pop();
     } else if (isBlock(current) && token.keyword === "else") {
-      const nextChild: GoBlock = {
-        type: "block",
-        start: inline,
-        end: null,
-        children: {},
-        keyword: token.keyword as GoBlockKeyword,
-        index: token.index,
-        parent: current.parent,
-        contentStart: token.index + token.length,
-        content: "",
-        aliasedContent: "",
-        length: -1,
-        id: createID(),
-        startDelimiter: token.startDelimiter,
-        endDelimiter: token.endDelimiter,
-      };
+      const nextChild = createBlockNode(token, inline, current.parent);
 
       if (isMultiBlock(current.parent)) {
         current.parent.blocks.push(nextChild);
@@ -108,23 +79,7 @@ export const parseGoTemplate: Parser<GoNode>["parse"] = (text, _options) => {
       nodeStack.pop();
       nodeStack.push(nextChild);
     } else if (token.keyword) {
-      const block: GoBlock = {
-        type: "block",
-        start: inline,
-        end: null,
-        children: {},
-        keyword: token.keyword as GoBlockKeyword,
-        index: token.index,
-        parent: current,
-        contentStart: token.index + token.length,
-        content: "",
-        aliasedContent: "",
-        length: -1,
-        id: createID(),
-        startDelimiter: token.startDelimiter,
-        endDelimiter: token.endDelimiter,
-      };
-
+      const block = createBlockNode(token, inline, current);
       current.children[block.id] = block;
       nodeStack.push(block);
     } else {
@@ -153,15 +108,47 @@ function createRootNode(text: string): GoRoot {
   } satisfies GoRoot;;
 }
 
-function createUnformattableNode(token: Token, parent: GoParentNode): GoUnformattable {
+function createUnformattableNode(token: Token & { index: number }, parent: GoParentNode): GoUnformattable {
   return {
     id: createID(),
     type: "unformattable",
-    index: token.index ?? -1,
+    index: token.index,
     length: token.length,
     content: token.unformattable ?? "",
     parent,
   };
+}
+
+function createInlineNode(token: Token & { index: number, statement: string }, parent: GoParentNode): GoInline {
+  return {
+    index: token.index,
+    length: token.length,
+    startDelimiter: token.startDelimiter,
+    endDelimiter: token.endDelimiter,
+    parent,
+    type: "inline",
+    statement: token.statement,
+    id: createID(),
+  }
+}
+
+function createBlockNode(token: Token & { index: number }, inline: GoInline, parent: GoParentNode): GoBlock {
+  return {
+    type: "block",
+    start: inline,
+    end: null,
+    children: {},
+    keyword: token.keyword as GoBlockKeyword,
+    index: token.index,
+    parent: parent,
+    contentStart: token.index + token.length,
+    content: "",
+    aliasedContent: "",
+    length: -1,
+    id: createID(),
+    startDelimiter: token.startDelimiter,
+    endDelimiter: token.endDelimiter,
+  }
 }
 
 function aliasNodeContent(current: GoBlock | GoRoot): string {
@@ -203,3 +190,4 @@ export function isRoot(node?: GoNode): node is GoRoot {
 export function isUnformattable(node: GoNode): node is GoRoot {
   return node.type === "unformattable";
 }
+
