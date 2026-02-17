@@ -4,16 +4,8 @@ import { createID } from "./create-id";
 import { tokenize } from "./tokenizer";
 
 export const parseGoTemplate: Parser<GoNode>["parse"] = (text, _options) => {
-  const root: GoRoot = {
-    type: "root",
-    content: text,
-    aliasedContent: "",
-    children: {},
-    index: 0,
-    contentStart: 0,
-    length: text.length,
-  };
-  const nodeStack: (GoBlock | GoRoot)[] = [root];
+  const root = createRootNode(text);
+  const nodeStack: (GoRoot | GoBlock)[] = [root];
 
   for (const match of tokenize(text)) {
     const current = last(nodeStack);
@@ -159,6 +151,18 @@ export const parseGoTemplate: Parser<GoNode>["parse"] = (text, _options) => {
 
   return root;
 };
+
+function createRootNode(text: string): GoRoot {
+  return {
+    type: "root",
+    content: text,
+    aliasedContent: "",
+    children: {},
+    index: 0,
+    contentStart: 0,
+    length: text.length,
+  } satisfies GoRoot;;
+}
 
 function aliasNodeContent(current: GoBlock | GoRoot): string {
   let result = current.content;
