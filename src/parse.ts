@@ -1,7 +1,7 @@
-import type { GoNode, GoRoot, GoBlock, GoInline, GoMultiBlock, GoBlockKeyword, GoInlineStartDelimiter, GoInlineEndDelimiter  } from "./types";
+import type { GoNode, GoRoot, GoBlock, GoInline, GoMultiBlock, GoBlockKeyword, GoInlineStartDelimiter, GoInlineEndDelimiter, GoUnformattable, GoParentNode  } from "./types";
 import { Parser } from "prettier";
 import { createID } from "./create-id";
-import { tokenize } from "./tokenizer";
+import { Token, tokenize } from "./tokenizer";
 
 export const parseGoTemplate: Parser<GoNode>["parse"] = (text, _options) => {
   const root = createRootNode(text);
@@ -17,16 +17,10 @@ export const parseGoTemplate: Parser<GoNode>["parse"] = (text, _options) => {
     if (token.index === undefined) {
       throw Error("Regex match index undefined.");
     }
-    const id = createID();
+    
     if (token.unformattable) {
-      current.children[id] = {
-        id,
-        type: "unformattable",
-        index: token.index,
-        length: token.length,
-        content: token.unformattable,
-        parent: current,
-      };
+      let node = createUnformattableNode(token, current);
+      current.children[node.id] = node;
       continue;
     }
 
@@ -34,6 +28,7 @@ export const parseGoTemplate: Parser<GoNode>["parse"] = (text, _options) => {
       throw Error("Formattable match without statement.");
     }
 
+    const id = createID();
     const inline: GoInline = {
       index: token.index,
       length: token.length,
@@ -156,6 +151,17 @@ function createRootNode(text: string): GoRoot {
     contentStart: 0,
     length: text.length,
   } satisfies GoRoot;;
+}
+
+function createUnformattableNode(token: Token, parent: GoParentNode): GoUnformattable {
+  return {
+    id: createID(),
+    type: "unformattable",
+    index: token.index ?? -1,
+    length: token.length,
+    content: token.unformattable ?? "",
+    parent,
+  };
 }
 
 function aliasNodeContent(current: GoBlock | GoRoot): string {

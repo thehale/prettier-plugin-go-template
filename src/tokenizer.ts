@@ -18,6 +18,8 @@ function toToken(match: RegExpMatchArray) {
   }
 }
 
+export type Token = ReturnType<typeof toToken>;
+
 // ---------------------------------------------------------------------------------------
 
 const TEMPLATE_START = '{{';

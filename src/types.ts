@@ -5,6 +5,11 @@ export type GoNode =
   | GoMultiBlock
   | GoUnformattable;
 
+export type GoParentNode = 
+  | GoRoot
+  | GoBlock
+  | GoMultiBlock;
+
 export type GoRoot = { type: "root" } & Omit<
   GoBlock,
   | "type"
@@ -48,7 +53,7 @@ export interface GoBaseNode<Type extends string> {
   type: Type;
   index: number;
   length: number;
-  parent: GoBlock | GoRoot | GoMultiBlock;
+  parent: GoParentNode;
 }
 
 export interface WithDelimiter {
