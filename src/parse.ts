@@ -20,13 +20,10 @@ export const parseGoTemplate: Parser<GoNode>["parse"] = (text, _options) => {
     const current = last(nodeStack);
     const keyword = match.groups?.keyword as GoBlockKeyword | undefined;
     const statement = match.groups?.statement;
-    const unformattable =
-      match.groups?.unformattableScript ?? match.groups?.unformattableStyle;
+    const unformattable = match.groups?.unformattableScript ?? match.groups?.unformattableStyle;
 
-    const startDelimiter = (match.groups?.startdelimiter ??
-      "") as GoInlineStartDelimiter;
-    const endDelimiter = (match.groups?.endDelimiter ??
-      "") as GoInlineEndDelimiter;
+    const startDelimiter = (match.groups?.startdelimiter ?? "") as GoInlineStartDelimiter;
+    const endDelimiter = (match.groups?.endDelimiter ?? "") as GoInlineEndDelimiter;
 
     if (current === undefined) {
       throw Error("Node stack empty.");
