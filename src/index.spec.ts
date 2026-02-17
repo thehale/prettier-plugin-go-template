@@ -8,7 +8,7 @@ const prettify = (
   options: Partial<GoTemplatePlugin.PrettierPluginGoTemplateParserOptions>,
 ) =>
   prettier.format(code, {
-    parser: "go-template" as any,
+    parser: "go-template",
     plugins: [GoTemplatePlugin],
     ...options,
   });
@@ -34,7 +34,7 @@ describe("format", () => {
       const format = () => prettify(input, configObject);
 
       if (expectedError) {
-        jest.spyOn(console, "error").mockImplementation(() => {});
+        jest.spyOn(console, "error").mockImplementation();
         await expect(format()).rejects.toEqual(new Error(expectedError));
       } else {
         const result = prettify(input, configObject);
