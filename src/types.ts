@@ -16,7 +16,6 @@ export type GoRoot = { type: "root" } & Omit<
   | "keyword"
   | "parent"
   | "statement"
-  | "id"
   | "startDelimiter"
   | "endDelimiter"
   | "start"

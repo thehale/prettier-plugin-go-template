@@ -12,13 +12,14 @@ export const createNode = {
 
 function createRootNode(text: string): GoRoot {
   return {
+    id: createID(),
     type: "root",
+    index: 0,
+    length: text.length,
+    contentStart: 0,
     content: text,
     aliasedContent: "",
     children: {},
-    index: 0,
-    contentStart: 0,
-    length: text.length,
   } satisfies GoRoot;;
 }
 
@@ -35,44 +36,44 @@ function createUnformattableNode(token: Token & { index: number }, parent: GoPar
 
 function createInlineNode(token: Token & { index: number, statement: string }, parent: GoParentNode): GoInline {
   return {
+    id: createID(),
+    type: "inline",
     index: token.index,
     length: token.length,
     startDelimiter: token.startDelimiter,
     endDelimiter: token.endDelimiter,
-    parent,
-    type: "inline",
     statement: token.statement,
-    id: createID(),
+    parent,
   } satisfies GoInline;
 }
 
 function createBlockNode(token: Token & { index: number }, inline: GoInline, parent: GoParentNode): GoBlock {
   return {
+    id: createID(),
     type: "block",
+    index: token.index,
+    length: -1,
+    startDelimiter: token.startDelimiter,
+    endDelimiter: token.endDelimiter,
     start: inline,
     end: null,
-    children: {},
     keyword: token.keyword as GoBlockKeyword,
-    index: token.index,
-    parent: parent,
     contentStart: token.index + token.length,
     content: "",
     aliasedContent: "",
-    length: -1,
-    id: createID(),
-    startDelimiter: token.startDelimiter,
-    endDelimiter: token.endDelimiter,
+    children: {},
+    parent: parent,
   } satisfies GoBlock;
 }
 
 function createMultiBlock(block: GoBlock, parent: GoParentNode): GoMultiBlock {
   return {
+    id: createID(),
     type: "multi-block",
-    parent: parent,
     index: block.index,
     length: -1,
     keyword: block.keyword,
-    id: createID(),
     blocks: [block],
+    parent: parent,
   } satisfies GoMultiBlock;
 }
