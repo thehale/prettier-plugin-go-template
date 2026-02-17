@@ -1,6 +1,6 @@
 import type { GoNode, GoRoot, GoBlock, GoInline, GoMultiBlock, GoBlockKeyword, GoInlineStartDelimiter, GoInlineEndDelimiter  } from "./types";
 import { Parser } from "prettier";
-import { createIdGenerator } from "./create-id-generator";
+import { createID } from "./create-id";
 
 export const parseGoTemplate: Parser<GoNode>["parse"] = (text, _options) => {
   const regex =
@@ -15,7 +15,6 @@ export const parseGoTemplate: Parser<GoNode>["parse"] = (text, _options) => {
     length: text.length,
   };
   const nodeStack: (GoBlock | GoRoot)[] = [root];
-  const getId = createIdGenerator();
 
   for (const match of text.matchAll(regex)) {
     const current = last(nodeStack);
@@ -36,7 +35,7 @@ export const parseGoTemplate: Parser<GoNode>["parse"] = (text, _options) => {
     if (match.index === undefined) {
       throw Error("Regex match index undefined.");
     }
-    const id = getId();
+    const id = createID();
     if (unformattable) {
       current.children[id] = {
         id,
@@ -97,7 +96,7 @@ export const parseGoTemplate: Parser<GoNode>["parse"] = (text, _options) => {
         content: "",
         aliasedContent: "",
         length: -1,
-        id: getId(),
+        id: createID(),
         startDelimiter,
         endDelimiter,
       };
@@ -124,7 +123,7 @@ export const parseGoTemplate: Parser<GoNode>["parse"] = (text, _options) => {
         }
       }
 
-      current.id = getId();
+      current.id = createID();
       current.length = match[0].length + match.index - current.index;
       current.content = text.substring(current.contentStart, match.index);
       current.aliasedContent = aliasNodeContent(current);
@@ -144,7 +143,7 @@ export const parseGoTemplate: Parser<GoNode>["parse"] = (text, _options) => {
         content: "",
         aliasedContent: "",
         length: -1,
-        id: getId(),
+        id: createID(),
         startDelimiter,
         endDelimiter,
       };
