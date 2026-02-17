@@ -116,7 +116,7 @@ function createUnformattableNode(token: Token & { index: number }, parent: GoPar
     length: token.length,
     content: token.unformattable ?? "",
     parent,
-  };
+  } satisfies GoUnformattable;
 }
 
 function createInlineNode(token: Token & { index: number, statement: string }, parent: GoParentNode): GoInline {
@@ -129,7 +129,7 @@ function createInlineNode(token: Token & { index: number, statement: string }, p
     type: "inline",
     statement: token.statement,
     id: createID(),
-  }
+  } satisfies GoInline;
 }
 
 function createBlockNode(token: Token & { index: number }, inline: GoInline, parent: GoParentNode): GoBlock {
@@ -148,7 +148,7 @@ function createBlockNode(token: Token & { index: number }, inline: GoInline, par
     id: createID(),
     startDelimiter: token.startDelimiter,
     endDelimiter: token.endDelimiter,
-  }
+  } satisfies GoBlock;
 }
 
 function aliasNodeContent(current: GoBlock | GoRoot): string {
